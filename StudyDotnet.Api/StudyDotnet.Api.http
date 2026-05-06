@@ -1,4 +1,4 @@
-@StudyDotnet.Api_HostAddress = http://localhost:5000
+@StudyDotnet.Api_HostAddress = http://localhost:5057
 
 GET {{StudyDotnet.Api_HostAddress}}/
 Accept: application/json
@@ -16,6 +16,13 @@ GET {{StudyDotnet.Api_HostAddress}}/api/v1/companies/count
 Accept: application/json
 X-Api-Key: study-key
 X-Tenant: lab
+
+###
+
+GET {{StudyDotnet.Api_HostAddress}}/api/v1/devices?keyword=hik&supplier=HIKvision&page=1&pageSize=10
+Accept: application/json
+X-Api-Key: study-key
+X-Tenant: demo
 
 ###
 

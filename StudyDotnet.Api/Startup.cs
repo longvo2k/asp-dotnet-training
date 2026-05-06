@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 using StudyDotnet.Api.Auth;
 using StudyDotnet.Api.Data;
 using StudyDotnet.Api.Middleware;
@@ -24,7 +25,38 @@ public sealed class Startup
     {
         // Week 3: Controllers are discovered by ASP.NET Core and receive services by DI.
         services.AddControllers();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "Demo token",
+                In = ParameterLocation.Header,
+                Description = "Paste the token returned from POST /api/v2/auth/login."
+            });
+
+            options.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+            {
+                Name = "X-Api-Key",
+                Type = SecuritySchemeType.ApiKey,
+                In = ParameterLocation.Header,
+                Description = "Use study-key for this demo."
+            });
+
+            options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecuritySchemeReference("Bearer", document, externalResource: null),
+                    new List<string>()
+                },
+                {
+                    new OpenApiSecuritySchemeReference("ApiKey", document, externalResource: null),
+                    new List<string>()
+                }
+            });
+        });
 
         // Week 4: Authentication reads the Bearer token and creates HttpContext.User.
         // Authorization makes [Authorize] attributes block anonymous requests.
@@ -129,7 +161,7 @@ public sealed class Startup
                         "GET /api/v1/companies",
                         "GET /api/v1/companies/count",
                         "GET /api/v1/profile/me",
-                        "POST /api/v1/devices/search",
+                        "POST /api/v1/devices",
                         "POST /api/v2/auth/login"
                     },
                     ApiKeyHeader = "X-Api-Key: study-key",

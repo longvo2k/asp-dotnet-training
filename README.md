@@ -22,7 +22,7 @@ The app prints the local URL, usually `http://localhost:5xxx`.
 Swagger UI is available at:
 
 ```text
-http://localhost:5000/swagger
+http://localhost:5057/swagger
 ```
 
 ## Try The API
@@ -30,14 +30,22 @@ http://localhost:5000/swagger
 Most v1 endpoints require the API key header:
 
 ```bash
-curl -H "X-Api-Key: study-key" -H "X-Tenant: demo" http://localhost:5000/api/v1/companies
-curl -H "X-Api-Key: study-key" -H "X-Tenant: lab" http://localhost:5000/api/v1/companies/count
+curl -H "X-Api-Key: study-key" -H "X-Tenant: demo" http://localhost:5057/api/v1/companies
+curl -H "X-Api-Key: study-key" -H "X-Tenant: lab" http://localhost:5057/api/v1/companies/count
 ```
 
-Search devices:
+Devices:
 
 ```bash
-curl -X POST http://localhost:5000/api/v1/devices/search \
+curl "http://localhost:5057/api/v1/devices?keyword=hik&supplier=HIKvision&page=1&pageSize=10" \
+  -H "X-Api-Key: study-key" \
+  -H "X-Tenant: demo"
+```
+
+Device search also supports POST with the same filters:
+
+```bash
+curl -X POST http://localhost:5057/api/v1/devices/search \
   -H "Content-Type: application/json" \
   -H "X-Api-Key: study-key" \
   -H "X-Tenant: demo" \
@@ -47,7 +55,7 @@ curl -X POST http://localhost:5000/api/v1/devices/search \
 Login demo:
 
 ```bash
-curl -X POST http://localhost:5000/api/v2/auth/login \
+curl -X POST http://localhost:5057/api/v2/auth/login \
   -H "Content-Type: application/json" \
   -d '{"userName":"admin","password":"study"}'
 ```
@@ -57,7 +65,7 @@ Protected endpoint with `[Authorize]`, `ClaimsPrincipal`, and claims:
 ```bash
 TOKEN="paste-token-from-login"
 
-curl http://localhost:5000/api/v1/profile/me \
+curl http://localhost:5057/api/v1/profile/me \
   -H "X-Api-Key: study-key" \
   -H "Authorization: Bearer $TOKEN"
 ```
@@ -65,10 +73,10 @@ curl http://localhost:5000/api/v1/profile/me \
 Status code examples:
 
 ```bash
-curl http://localhost:5000/api/v1/companies
-curl -H "X-Api-Key: study-key" http://localhost:5000/api/v1/companies
-curl -H "X-Api-Key: study-key" -H "X-Tenant: demo" http://localhost:5000/missing
-curl -H "X-Api-Key: study-key" -H "X-Tenant: demo" http://localhost:5000/api/v1/debug/error
+curl http://localhost:5057/api/v1/companies
+curl -H "X-Api-Key: study-key" http://localhost:5057/api/v1/companies
+curl -H "X-Api-Key: study-key" -H "X-Tenant: demo" http://localhost:5057/missing
+curl -H "X-Api-Key: study-key" -H "X-Tenant: demo" http://localhost:5057/api/v1/debug/error
 ```
 
 ## What To Read

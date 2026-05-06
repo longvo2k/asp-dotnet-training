@@ -17,7 +17,12 @@ public sealed class DeviceService : IDeviceService
         _tenantContext = tenantContext;
     }
 
-    public async Task<PagedResult<DeviceDto>> SearchAsync(SearchDevicesRequest request)
+    public Task<PagedResult<DeviceDto>> SearchAsync(SearchDevicesRequest request)
+    {
+        return GetPaginatedListAsync(request);
+    }
+
+    public async Task<PagedResult<DeviceDto>> GetPaginatedListAsync(SearchDevicesRequest request)
     {
         var page = Math.Max(request.Page, 1);
         var pageSize = Math.Clamp(request.PageSize, 1, 50);
@@ -27,7 +32,8 @@ public sealed class DeviceService : IDeviceService
 
         if (!string.IsNullOrWhiteSpace(request.Keyword))
         {
-            query = query.Where(device => device.Name.Contains(request.Keyword, StringComparison.OrdinalIgnoreCase));
+            var keyword = request.Keyword.Trim().ToLower();
+            query = query.Where(device => device.Name.ToLower().Contains(keyword));
         }
 
         if (Enum.TryParse<DeviceSupplier>(request.Supplier, ignoreCase: true, out var supplier))

@@ -15,6 +15,13 @@ public sealed class DevicesController : ControllerBase
         _deviceService = deviceService;
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetDevices([FromQuery] SearchDevicesRequest request)
+    {
+        var result = await _deviceService.GetPaginatedListAsync(request);
+        return Ok(result);
+    }
+
     [HttpPost("search")]
     public async Task<IActionResult> SearchDevices(SearchDevicesRequest request)
     {

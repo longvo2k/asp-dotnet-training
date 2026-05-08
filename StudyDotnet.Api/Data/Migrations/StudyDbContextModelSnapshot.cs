@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using StudyDotnet.Api.Data;
+using StudyDotnet.Data.EF;
 
 #nullable disable
 
-namespace StudyDotnet.Api.Data.Migrations
+namespace StudyDotnet.Data.EF.Migrations
 {
     [DbContext(typeof(StudyDbContext))]
     partial class StudyDbContextModelSnapshot : ModelSnapshot
@@ -22,7 +22,7 @@ namespace StudyDotnet.Api.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("StudyDotnet.Api.Domain.Company", b =>
+            modelBuilder.Entity("StudyDotnet.Domain.Entities.Company", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -83,7 +83,7 @@ namespace StudyDotnet.Api.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("StudyDotnet.Api.Domain.Device", b =>
+            modelBuilder.Entity("StudyDotnet.Domain.Entities.Device", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -167,9 +167,9 @@ namespace StudyDotnet.Api.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("StudyDotnet.Api.Domain.Device", b =>
+            modelBuilder.Entity("StudyDotnet.Domain.Entities.Device", b =>
                 {
-                    b.HasOne("StudyDotnet.Api.Domain.Company", "Company")
+                    b.HasOne("StudyDotnet.Domain.Entities.Company", "Company")
                         .WithMany("Devices")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -178,7 +178,7 @@ namespace StudyDotnet.Api.Data.Migrations
                     b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("StudyDotnet.Api.Domain.Company", b =>
+            modelBuilder.Entity("StudyDotnet.Domain.Entities.Company", b =>
                 {
                     b.Navigation("Devices");
                 });

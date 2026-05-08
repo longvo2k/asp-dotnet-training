@@ -1,12 +1,16 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
+using Quartz;
 using StudyDotnet.Commons.Constants;
 using StudyDotnet.Commons.Tenancy;
 using StudyDotnet.Data.EF;
 using StudyDotnet.Data.Uow;
 using StudyDotnet.Security.Auth;
 using StudyDotnet.Services;
+using StudyDotnet.Services.DeviceIntegrations.HIKvision;
+using StudyDotnet.Services.DeviceIntegrations.ZKTeco;
+using StudyDotnet.Services.ScheduledTasks.Jobs;
 
 namespace StudyDotnet.Api.Extensions;
 
@@ -22,6 +26,7 @@ public static class ServiceCollectionExtension
         services.AddStudyDotnetCors();
         services.AddStudyDotnetDatabase(configuration);
         services.AddStudyDotnetApplicationServices();
+        services.AddStudyDotnetScheduledJobs();
 
         return services;
     }
@@ -117,6 +122,47 @@ public static class ServiceCollectionExtension
         services.AddScoped<ICompanyService, CompanyService>();
         services.AddScoped<IDeviceService, DeviceService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IZkTecoService, ZkTecoService>();
+        services.AddHttpClient<IHIKvisionService, HIKvisionService>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddStudyDotnetScheduledJobs(this IServiceCollection services)
+    {
+        services.AddQuartz(options =>
+        {
+            options.ScheduleJob<JobMandayLogs>(trigger => trigger
+                .WithIdentity("JobMandayLogs-trigger")
+                .WithCronSchedule("0 0 13 ? * *"));
+
+            options.ScheduleJob<JobHIKDeviceCmds>(trigger => trigger
+                .WithIdentity("JobHIKDeviceCmds-trigger")
+                .WithSimpleSchedule(schedule => schedule
+                    .WithIntervalInMinutes(15)
+                    .RepeatForever()));
+
+            options.ScheduleJob<JobPullUserHIKDevice>(trigger => trigger
+                .WithIdentity("JobPullUserHIKDevice-trigger")
+                .WithSimpleSchedule(schedule => schedule
+                    .WithIntervalInMinutes(5)
+                    .RepeatForever()));
+
+            options.ScheduleJob<JobPullEventHIKDevice>(trigger => trigger
+                .WithIdentity("JobPullEventHIKDevice-trigger")
+                .WithSimpleSchedule(schedule => schedule
+                    .WithIntervalInMinutes(3)
+                    .RepeatForever()));
+
+            options.ScheduleJob<JobCleanupDeviceCmds>(trigger => trigger
+                .WithIdentity("JobCleanupDeviceCmds-trigger")
+                .WithCronSchedule("0 0 2 ? * *"));
+        });
+
+        services.AddQuartzHostedService(options =>
+        {
+            options.WaitForJobsToComplete = true;
+        });
 
         return services;
     }
